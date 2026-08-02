@@ -9,11 +9,15 @@
   </head>
   <body class="bg-gray-100 text-gray-800 p-6">
     <h1 class="text-2xl font-bold text-center mb-6">Katalog Produk UMKM</h1>
+    <input
+      class="w-full max-w-md mx-auto block mb-6 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      type="text"
+      id="searchInput"
+      placeholder="Cari menu kopi..."
+    />
     <main>
       <section>
-        <div class="container">
-          <div class="product"></div>
-        </div>
+        <div class="container p-4 grid grid-cols-1 md:grid-cols-3 gap-6"></div>
       </section>
     </main>
 
