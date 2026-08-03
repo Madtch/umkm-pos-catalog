@@ -5,6 +5,7 @@ import { products } from "./data.js";
 // console.log("--- Data Produk Berhasil Di-import ---");
 // console.log(products);
 
+let cart = [];
 const searchInput = document.getElementById("searchInput");
 const container = document.querySelector(".container");
 
@@ -32,16 +33,30 @@ renderProduct(products);
 searchInput.addEventListener("input", (e) => {
   // 1. Ambil teks ketikan user:
   const keyword = e.target.value.toLowerCase();
+
   // 2. Filter array 'products' berdasarkan 'keyword':
   const filteredProducts = products.filter((produk) => {
     return produk.name.toLowerCase().includes(keyword);
   });
   // 3. Render ulang UI dengan data yang sudah difilter:
-  console.log(e.target.value);
+  // console.log(e.target.value);
   renderProduct(filteredProducts);
 });
 
 container.addEventListener("click", (e) => {
-  console.log(e.target);
-  console.log(e.target.dataset.id);
+  // console.log(e.target);
+  // console.log(e.target.dataset.id);
+  const ID = e.target.dataset.id;
+  if (e.target.dataset.id) {
+    // console.log(e.target.dataset.id + "Tes");
+    const productID = Number(ID);
+    const targetProduct = products.find((item) => item.id === productID);
+    const itemInCart = cart.find((item) => item.id === productID);
+    if (itemInCart) {
+      itemInCart.quantity += 1;
+    } else {
+      cart.push({ ...targetProduct, quantity: 1 });
+    }
+  }
+  console.log(cart);
 });
