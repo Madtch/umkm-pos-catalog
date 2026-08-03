@@ -63,6 +63,47 @@ container.addEventListener("click", (e) => {
   renderCart();
 });
 
+cartContainer.addEventListener("click", (e) => {
+  const action = e.target.dataset.action;
+  const id = Number(e.target.dataset.id);
+
+  if (!action) return;
+
+  const item = cart.find((item) => {
+    return item.id === id;
+  });
+
+  // if (action === "increase") {
+  //   item.quantity += 1;
+  // } else if (action === "decrease") {
+  //   if (item.quantity > 1) {
+  //     item.quantity -= 1;
+  //   } else item.quantity === 1;
+  //   cart = cart.filter((cartItem) => {
+  //     cartItem.id !== id;
+  //   });
+  // } else if (action === "delete")
+  //   cart = cart.filter((cartItem) => cartItem.id !== id);
+
+  switch (action) {
+    case "increase":
+      item.quantity += 1;
+      break;
+    case "decrease":
+      if (item.quantity > 1) {
+        item.quantity -= 1;
+      } else {
+        cart = cart.filter((cartItem) => cartItem.id !== id);
+      }
+      break;
+    case "delete":
+      cart = cart.filter((cartItem) => cartItem.id !== id);
+      break;
+  }
+
+  renderCart();
+});
+
 function renderCart() {
   let htmlCart = "";
 
@@ -84,6 +125,10 @@ function renderCart() {
     htmlCart += `
     <div class="flex justify-between items-center border-b pb-3 mb-3">
     <div>
+    <button data-id="${item.id}" data-action="decrease">-</button>
+    <span>${item.quantity}</span>
+    <button data-id="${item.id}" data-action="increase">+</button>
+    <button data-id="${item.id}" data-action="delete">Hapus</button>
     <h4 class="font-bold text-gray-800">${item.name}</h4>
     <p class="text-sm text-gray-500">Rp ${item.price} x ${item.quantity}</p>
     </div>
