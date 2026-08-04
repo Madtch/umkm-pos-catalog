@@ -179,3 +179,9 @@ const newCoupon: Coupon = {
   discountPercentage: 60,
   isActive: true,
 };
+
+async function fetchProductsFromAPI() {
+  const response = await fetch(
+    "[https://fakestoreapi.com/products](https://fakestoreapi.com/products)",
+  );
+}
