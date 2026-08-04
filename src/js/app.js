@@ -5,7 +5,7 @@ import { products } from "./data.js";
 // console.log("--- Data Produk Berhasil Di-import ---");
 // console.log(products);
 
-let cart = [];
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 const searchInput = document.getElementById("searchInput");
 const container = document.querySelector(".container");
 const cartContainer = document.getElementById("cartContainer");
@@ -105,6 +105,7 @@ cartContainer.addEventListener("click", (e) => {
 });
 
 function renderCart() {
+  localStorage.setItem("cart", JSON.stringify(cart));
   let htmlCart = "";
 
   // (Keranjang Kosong)
