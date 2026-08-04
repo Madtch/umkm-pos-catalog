@@ -1,0 +1,26 @@
+{
+  "name": "umkm-pos-catalog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Madtch/umkm-pos-catalog.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Madtch/umkm-pos-catalog/issues"
+  },
+  "homepage": "https://github.com/Madtch/umkm-pos-catalog#readme",
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.2.0"
+  }
+}

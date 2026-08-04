@@ -1,16 +1,17 @@
 // Ambil variabel 'products' dari file data.js
-import { products } from "./data.js";
+import { products } from "./data.ts";
+import { Product, CartItem } from "./types.ts";
 
 // Tes datanya berhasil masuk atau engga
 // console.log("--- Data Produk Berhasil Di-import ---");
 // console.log(products);
 
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-const searchInput = document.getElementById("searchInput");
-const container = document.querySelector(".container");
-const cartContainer = document.getElementById("cartContainer");
+let cart: CartItem[] = JSON.parse(localStorage.getItem("cart") || "[]");
+const searchInput = document.getElementById("searchInput") as HTMLInputElement;
+const container = document.querySelector(".container") as HTMLElement;
+const cartContainer = document.getElementById("cartContainer") as HTMLElement;
 
-function renderProduct(dataArray) {
+function renderProduct(dataArray: Product[]) {
   let htmlContent = "";
   if (dataArray.length === 0) {
     htmlContent += `<p class="empty-state">Produk tidak ditemukan, coba kata kunci lain.</p>.`;
@@ -32,8 +33,10 @@ function renderProduct(dataArray) {
 renderProduct(products);
 
 searchInput.addEventListener("input", (e) => {
+  // const target = e.target as HTMLInputElement;
   // 1. Ambil teks ketikan user:
-  const keyword = e.target.value.toLowerCase();
+  const target = e.target as HTMLInputElement;
+  const keyword = target.value.toLocaleLowerCase();
 
   // 2. Filter array 'products' berdasarkan 'keyword':
   const filteredProducts = products.filter((produk) => {
@@ -47,16 +50,19 @@ searchInput.addEventListener("input", (e) => {
 container.addEventListener("click", (e) => {
   // console.log(e.target);
   // console.log(e.target.dataset.id);
-  const ID = e.target.dataset.id;
-  if (e.target.dataset.id) {
+  const target = e.target as HTMLElement;
+  const idString = target.dataset.id;
+  if (idString) {
     // console.log(e.target.dataset.id + "Tes");
-    const productID = Number(ID);
+    const productID = Number(idString);
     const targetProduct = products.find((item) => item.id === productID);
     const itemInCart = cart.find((item) => item.id === productID);
     if (itemInCart) {
       itemInCart.quantity += 1;
     } else {
-      cart.push({ ...targetProduct, quantity: 1 });
+      if (targetProduct) {
+        cart.push({ ...targetProduct, quantity: 1 });
+      }
     }
   }
   console.log(cart);
@@ -64,8 +70,9 @@ container.addEventListener("click", (e) => {
 });
 
 cartContainer.addEventListener("click", (e) => {
-  const action = e.target.dataset.action;
-  const id = Number(e.target.dataset.id);
+  const target = e.target as HTMLElement;
+  const action = target.dataset.action;
+  const id = Number(target.dataset.id);
 
   if (!action) return;
 
@@ -73,17 +80,9 @@ cartContainer.addEventListener("click", (e) => {
     return item.id === id;
   });
 
-  // if (action === "increase") {
-  //   item.quantity += 1;
-  // } else if (action === "decrease") {
-  //   if (item.quantity > 1) {
-  //     item.quantity -= 1;
-  //   } else item.quantity === 1;
-  //   cart = cart.filter((cartItem) => {
-  //     cartItem.id !== id;
-  //   });
-  // } else if (action === "delete")
-  //   cart = cart.filter((cartItem) => cartItem.id !== id);
+  if (!item) {
+    return;
+  }
 
   switch (action) {
     case "increase":
@@ -100,6 +99,18 @@ cartContainer.addEventListener("click", (e) => {
       cart = cart.filter((cartItem) => cartItem.id !== id);
       break;
   }
+
+  // if (action === "increase") {
+  //   item.quantity += 1;
+  // } else if (action === "decrease") {
+  //   if (item.quantity > 1) {
+  //     item.quantity -= 1;
+  //   } else item.quantity === 1;
+  //   cart = cart.filter((cartItem) => {
+  //     cartItem.id !== id;
+  //   });
+  // } else if (action === "delete")
+  //   cart = cart.filter((cartItem) => cartItem.id !== id);
 
   renderCart();
 });
@@ -156,3 +167,15 @@ function renderCart() {
 }
 
 renderCart();
+
+interface Coupon {
+  code: string;
+  discountPercentage: number;
+  isActive: boolean;
+}
+
+const newCoupon: Coupon = {
+  code: "Promo",
+  discountPercentage: 60,
+  isActive: true,
+};
