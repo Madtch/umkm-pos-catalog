@@ -6,6 +6,7 @@ import { Product, CartItem } from "./types.ts";
 // console.log("--- Data Produk Berhasil Di-import ---");
 // console.log(products);
 
+let allProducts: Product[] = [];
 let cart: CartItem[] = JSON.parse(localStorage.getItem("cart") || "[]");
 const searchInput = document.getElementById("searchInput") as HTMLInputElement;
 const container = document.querySelector(".container") as HTMLElement;
@@ -39,7 +40,7 @@ searchInput.addEventListener("input", (e) => {
   const keyword = target.value.toLocaleLowerCase();
 
   // 2. Filter array 'products' berdasarkan 'keyword':
-  const filteredProducts = products.filter((produk) => {
+  const filteredProducts = allProducts.filter((produk) => {
     return produk.name.toLowerCase().includes(keyword);
   });
   // 3. Render ulang UI dengan data yang sudah difilter:
@@ -55,7 +56,7 @@ container.addEventListener("click", (e) => {
   if (idString) {
     // console.log(e.target.dataset.id + "Tes");
     const productID = Number(idString);
-    const targetProduct = products.find((item) => item.id === productID);
+    const targetProduct = allProducts.find((item) => item.id === productID);
     const itemInCart = cart.find((item) => item.id === productID);
     if (itemInCart) {
       itemInCart.quantity += 1;
@@ -181,7 +182,16 @@ const newCoupon: Coupon = {
 };
 
 async function fetchProductsFromAPI() {
-  const response = await fetch(
-    "[https://fakestoreapi.com/products](https://fakestoreapi.com/products)",
-  );
+  const response = await fetch("https://fakestoreapi.com/products");
+  const data = await response.json();
+  allProducts = data.map((item: any) => {
+    return {
+      ...item,
+      name: item.title,
+    };
+  });
+
+  renderProduct(allProducts);
 }
+
+fetchProductsFromAPI();
