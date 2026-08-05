@@ -20,6 +20,7 @@ function renderProduct(dataArray: Product[]) {
     dataArray.forEach((produk) => {
       htmlContent += `
       <div class="card bg-white rounded-xl shadow-md p-5 flex flex-col justify-between">
+      <img class="h-48 object-contain mx-auto mb-4" src="${produk.image}" alt="${produk.name}">
       <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">${produk.category}</span>
       <h3 class="text-lg font-bold text-gray-800 my-1">${produk.name}</h3>
       <p class="text-gray-600 font-medium mb-4">Harga: Rp ${produk.price}</p>
@@ -182,16 +183,23 @@ const newCoupon: Coupon = {
 };
 
 async function fetchProductsFromAPI() {
-  const response = await fetch("https://fakestoreapi.com/products");
-  const data = await response.json();
-  allProducts = data.map((item: any) => {
-    return {
-      ...item,
-      name: item.title,
-    };
-  });
+  try {
+    container.innerHTML = `<p class="text-center py-10">Memuat produk...</p>`;
+    const response = await fetch("https://fakestoreapi.com/products");
+    const data = await response.json();
+    allProducts = data.map((item: any) => {
+      return {
+        ...item,
+        name: item.title,
+      };
+    });
 
-  renderProduct(allProducts);
+    renderProduct(allProducts);
+  } catch (error) {
+    container.innerHTML =
+      "<p>Gagal memuat produk. Periksa koneksi internetmu.</p>";
+  }
 }
 
 fetchProductsFromAPI();
+renderCart();
