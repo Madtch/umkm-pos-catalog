@@ -12,3 +12,9 @@ export interface Product {
 export interface CartItem extends Product {
   quantity: number;
 }
+
+export interface Coupon {
+  code: string;
+  discountPercentage: number;
+  isActive: boolean;
+}

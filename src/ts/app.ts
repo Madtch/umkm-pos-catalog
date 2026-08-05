@@ -1,13 +1,24 @@
 // Ambil variabel 'products' dari file data.js
-import { products } from "./data.ts";
-import { Product, CartItem } from "./types.ts";
+// import { products } from "./data.ts";
+import { Product, CartItem, Coupon } from "./types.ts";
 
 // Tes datanya berhasil masuk atau engga
 // console.log("--- Data Produk Berhasil Di-import ---");
 // console.log(products);
 
+const newCoupon: Coupon = {
+  code: "Promo",
+  discountPercentage: 60,
+  isActive: true,
+};
+
+// State Aplikasi
 let allProducts: Product[] = [];
 let cart: CartItem[] = JSON.parse(localStorage.getItem("cart") || "[]");
+let appliedDiscount: number = 0;
+let couponMessageText: string = "";
+
+// DOM Elements
 const searchInput = document.getElementById("searchInput") as HTMLInputElement;
 const container = document.querySelector(".container") as HTMLElement;
 const cartContainer = document.getElementById("cartContainer") as HTMLElement;
@@ -32,8 +43,7 @@ function renderProduct(dataArray: Product[]) {
   container.innerHTML = htmlContent;
 }
 
-renderProduct(products);
-
+// Event Search
 searchInput.addEventListener("input", (e) => {
   // const target = e.target as HTMLInputElement;
   // 1. Ambil teks ketikan user:
@@ -49,6 +59,7 @@ searchInput.addEventListener("input", (e) => {
   renderProduct(filteredProducts);
 });
 
+// Event tambah keranjang
 container.addEventListener("click", (e) => {
   // console.log(e.target);
   // console.log(e.target.dataset.id);
@@ -71,12 +82,36 @@ container.addEventListener("click", (e) => {
   renderCart();
 });
 
+// Event Delegation Keranjang, Aksi + Kupon
 cartContainer.addEventListener("click", (e) => {
   const target = e.target as HTMLElement;
+
+  // Penanganan Fitur Kupon
+  if (target.id === "apply-coupon-btn") {
+    const couponInput = document.getElementById(
+      "coupon-input",
+    ) as HTMLInputElement;
+    const inputCode = couponInput ? couponInput.value.trim() : "";
+
+    if (
+      inputCode.toLowerCase() === newCoupon.code.toLowerCase() &&
+      newCoupon.isActive
+    ) {
+      appliedDiscount = newCoupon.discountPercentage;
+      couponMessageText = `Kupon berhasil digunakan! Diskon ${appliedDiscount}%`;
+    } else {
+      appliedDiscount = 0;
+      couponMessageText = "Kode kupon tidak valid atau sudah tidak aktif.";
+    }
+    renderCart();
+    return;
+  }
+
+  // Penanganan Aksi Item (Increase, Decrease, Delete)
   const action = target.dataset.action;
   const id = Number(target.dataset.id);
 
-  if (!action) return;
+  if (!action || isNaN(id)) return;
 
   const item = cart.find((item) => {
     return item.id === id;
@@ -117,12 +152,15 @@ cartContainer.addEventListener("click", (e) => {
   renderCart();
 });
 
+// Render Keranjang Belanja
 function renderCart() {
   localStorage.setItem("cart", JSON.stringify(cart));
   let htmlCart = "";
 
   // (Keranjang Kosong)
   if (cart.length === 0) {
+    appliedDiscount = 0;
+    couponMessageText = "";
     cartContainer.innerHTML = `
     <h2 class="text-xl font-bold mb-4 border-b pb-2">Keranjang Belanja</h2>
     <p class="text-gray-400 text-center py-8">Keranjang masih kosong</p>
@@ -132,56 +170,77 @@ function renderCart() {
 
   // Jika Keranjang Ada Isinya
   htmlCart = `<h2 class="text-xl font-bold mb-4 border-b pb-2">Keranjang Belanja</h2>`;
-  let total = 0;
+  let subtotal = 0;
 
   cart.forEach((item) => {
-    total += item.price * item.quantity; // Hitung total DI DALAM loop
+    subtotal += item.price * item.quantity; // Hitung total DI DALAM loop
     htmlCart += `
     <div class="flex justify-between items-center border-b pb-3 mb-3">
-    <div>
-    <button data-id="${item.id}" data-action="decrease">-</button>
-    <span>${item.quantity}</span>
-    <button data-id="${item.id}" data-action="increase">+</button>
-    <button data-id="${item.id}" data-action="delete">Hapus</button>
-    <h4 class="font-bold text-gray-800">${item.name}</h4>
-    <p class="text-sm text-gray-500">Rp ${item.price} x ${item.quantity}</p>
-    </div>
-    <span class="font-bold text-blue-600">Rp ${item.price * item.quantity}</span>
-    </div>
+        <div>
+          <h4 class="font-bold text-gray-800">${item.name}</h4>
+          <p class="text-sm text-gray-500">Rp ${item.price.toLocaleString("id-ID")} x ${item.quantity}</p>
+          <div class="flex gap-2 mt-2 items-center">
+            <button data-id="${item.id}" data-action="decrease" class="bg-gray-200 px-2 rounded font-bold hover:bg-gray-300">-</button>
+            <span class="text-sm font-medium">${item.quantity}</span>
+            <button data-id="${item.id}" data-action="increase" class="bg-gray-200 px-2 rounded font-bold hover:bg-gray-300">+</button>
+            <button data-id="${item.id}" data-action="delete" class="text-red-500 text-xs ml-2 hover:underline">Hapus</button>
+          </div>
+        </div>
+        <span class="font-bold text-blue-600">Rp ${(item.price * item.quantity).toLocaleString("id-ID")}</span>
+      </div>
     `;
   });
 
-  // Tambahkan Total & Tombol Checkout
+  // Hitung Diskon & Total Akhir
+  const discountAmount = (subtotal * appliedDiscount) / 100;
+  const grandTotal = subtotal - discountAmount;
+
+  // Form Kupon + Total + Checkout
   htmlCart += `
-  <div class="mt-6 pt-4 border-t border-gray-200">
-    <div class="flex justify-between items-center text-lg font-bold mb-4">
-      <span>Total:</span>
-      <span class="text-blue-600">Rp ${total}</span>
+      <div class="mt-4 pt-2">
+      <div class="flex gap-2 mb-2">
+        <input
+          type="text"
+          id="coupon-input"
+          class="border px-3 py-1.5 rounded-lg text-sm w-full focus:outline-none focus:ring-1 focus:ring-blue-500"
+          placeholder="Masukkan kode kupon (misal: Promo)"
+        />
+        <button id="apply-coupon-btn" class="bg-gray-800 text-white text-sm px-4 py-1.5 rounded-lg hover:bg-gray-900 transition-colors">
+          Gunakan
+        </button>
+      </div>
+      ${couponMessageText ? `<p class="text-xs ${appliedDiscount > 0 ? "text-green-600" : "text-red-500"} mb-3">${couponMessageText}</p>` : ""}
     </div>
-    <button class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
-      Checkout / Bayar
-    </button>
-  </div>
-`;
+
+    <div class="mt-4 pt-4 border-t border-gray-200 space-y-2">
+      <div class="flex justify-between items-center text-sm text-gray-600">
+        <span>Subtotal:</span>
+        <span>Rp ${subtotal.toLocaleString("id-ID")}</span>
+      </div>
+      ${
+        appliedDiscount > 0
+          ? `
+      <div class="flex justify-between items-center text-sm text-green-600 font-medium">
+        <span>Diskon (${appliedDiscount}%):</span>
+        <span>- Rp ${discountAmount.toLocaleString("id-ID")}</span>
+      </div>`
+          : ""
+      }
+      <div class="flex justify-between items-center text-lg font-bold pt-2 border-t">
+        <span>Total:</span>
+        <span class="text-blue-600">Rp ${grandTotal.toLocaleString("id-ID")}</span>
+      </div>
+      <button class="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+        Checkout / Bayar
+      </button>
+    </div>
+  `;
 
   // Render ke DOM
   cartContainer.innerHTML = htmlCart;
 }
 
-renderCart();
-
-interface Coupon {
-  code: string;
-  discountPercentage: number;
-  isActive: boolean;
-}
-
-const newCoupon: Coupon = {
-  code: "Promo",
-  discountPercentage: 60,
-  isActive: true,
-};
-
+// Fetch Data dari API
 async function fetchProductsFromAPI() {
   try {
     container.innerHTML = `<p class="text-center py-10">Memuat produk...</p>`;
@@ -196,10 +255,10 @@ async function fetchProductsFromAPI() {
 
     renderProduct(allProducts);
   } catch (error) {
-    container.innerHTML =
-      "<p>Gagal memuat produk. Periksa koneksi internetmu.</p>";
+    container.innerHTML = `<p class="text-center col-span-3 text-red-500 py-10">Gagal memuat produk. Periksa koneksi internetmu.</p>`;
   }
 }
 
-fetchProductsFromAPI();
+// // Inisialisasi Aplikasi
 renderCart();
+fetchProductsFromAPI();
