@@ -10,14 +10,14 @@ Welcome to **UMKM POS & Catalog**! An interactive web application built to serve
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-- **📦 Dynamic Product Catalog:** Renders product lists asynchronously fetched from an API endpoint.
-- **🏷️ Interactive POS Cashier:** Real-time shopping cart management, item quantity updates, and total price calculation.
-- **🔒 Strongly Typed Architecture:** Leverages TypeScript interfaces and types for robust state management and bug prevention.
-- **🌐 Asynchronous Data Integration:** Handles API state management (loading, error handling, and response parsing) using modern Fetch API practices.
-- **🎨 Modern UI/UX:** Clean, responsive, and intuitive interface styled with Tailwind CSS.
-- **🤖 AI-Mentored Development:** Built with AI guidance to learn TypeScript best practices and clean code structure.
+- **Dynamic Product Catalog:** Renders product lists asynchronously fetched from an API endpoint.
+- **Interactive POS Cashier:** Real-time shopping cart management, item quantity updates, and total price calculation.
+- **Strongly Typed Architecture:** Leverages TypeScript interfaces and types for robust state management and bug prevention.
+- **Asynchronous Data Integration:** Handles API state management (loading, error handling, and response parsing) using modern Fetch API practices.
+- **Modern UI/UX:** Clean, responsive, and intuitive interface styled with Tailwind CSS.
+- **AI-Mentored Development:** Built with AI guidance to learn TypeScript best practices and clean code structure.
 
 ---
 
@@ -46,7 +46,7 @@ Make sure you have installed:
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/Madtch/umkm-pos-katalog.git](https://github.com/Madtch/umkm-pos-catalog.git)
+   git clone https://github.com/Madtch/umkm-pos-katalog.git
    cd umkm-pos-katalog
    ```
 2. **Install Dependencies:**
